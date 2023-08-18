@@ -1,0 +1,9 @@
+# Tutorial1 requirements
+# Usage: pip install -r requirements1.txt
+
+# Base ------------------------------------------------------------------------
+numpy
+scipy
+meshcat
+matplotlib
+cvxpy

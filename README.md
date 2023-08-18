@@ -1,4 +1,12 @@
-# YOLOv5 for distance estimation
+# Tutorial 1: Dynamics, Controls, Planning, and Multi-Robot Collision Avoidance
+
+We assume that you have Python 3.x with pip, and the ability to look at Jupyter notebooks. We recommend VS Code as an IDE.
+
+```
+pip install -r requirements1.txt
+```
+
+# Tutorial 2: YOLOv5 for distance estimation
 
 ## Getting started
 Create a virtual environment
@@ -23,9 +31,9 @@ python -m ipykernel install --user --name=venv
 
 ## Requirements
 
-All requirements are listed in the `requirements.txt`, to install them simply run:
+All requirements are listed in the `requirements2.txt`, to install them simply run:
 ```
-pip install -r requirements.txt
+pip install -r requirements2.txt
 ```
 
 ## Data
