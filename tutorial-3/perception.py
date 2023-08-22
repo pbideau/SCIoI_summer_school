@@ -83,7 +83,8 @@ class Perception:
             # distance in camera coordinates
             X = 0.5 * (b[0] * dist / F1 + b[2] * dist / F2)
             Y = b[3] * dist / F1
-            dist_cam = (X, Y)
+            Z = math.sqrt(dist**2 + X**2 + Y**2)
+            dist_cam = (X, Y, Z)
             
             distance.append(dist_cam)
                 
