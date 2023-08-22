@@ -23,6 +23,7 @@ class Perception:
         self.model_YOLO.conf = CONFIDENCE
         self.model_YOLO.to(DEVICE)
 
+
     def sense_relative_positions(self):
         # time.sleep(1)
         # return []
@@ -73,15 +74,20 @@ class Perception:
 
         for box in bounding_boxes:
             
-            F1 = math.sqrt(FOCALLENGTH_PX**2 + (box[3]-240)**2 + (box[0]-320)**2)
-            F2 = math.sqrt(FOCALLENGTH_PX**2 + (box[1]-240)**2 + (box[1]-320)**2)
+            F1 = math.sqrt(FOCALLENGTH_PX**2 + (box[3]-240)**2 + (box[0]-320)**2) #upper point
+            F2 = math.sqrt(FOCALLENGTH_PX**2 + (box[1]-240)**2 + (box[2]-320)**2) #lower point
             b = box[3]/F1 - box[1]/F2
             dist = ROBOT_HEIGHT_M / b
             print(dist)
+
+            # distance in camera coordinates
+            X = 0.5 * (b[0] * dist / F1 + b[2] * dist / F2)
+            Y = b[3] * dist / F1
+            dist_cam = (X, Y)
             
-            distance.append(dist)
+            distance.append(dist_cam)
                 
-        return distance
+        return distance_cam
 	
 	
     def visualize(self, im, bounding_boxes, distance):
