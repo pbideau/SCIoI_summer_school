@@ -1,4 +1,3 @@
-from buildhat import Motor
 import time
 from time import sleep
 import numpy as np
@@ -77,6 +76,9 @@ def main():
             [np.sin(theta),  np.cos(theta), y],
             [0, 0, 1]])
         
+        # You may add additional "virtual robots" into the rel_pos array here
+        # rel_pos.append([x,y,z])
+        
         # the scipy voronoi code only works for at least three robots -> add dummys if needed
         if len(rel_pos) < 2:
             rel_pos.append([5, 5])
@@ -89,14 +91,11 @@ def main():
             wp = T @ np.array([p[0], p[1], 1])
             world_pos.append(np.array([wp[0], wp[1], 0]))
 
-        print("wp", world_pos)
-
         vstates = np.array(world_pos)
 
         vrobots = [Robot(s) for s in vstates]
         for k, r in enumerate(vrobots):
             v.add_robot("r{}".format(k), r)
-        v.update_robots()
 
         p, vor = plan(vstates, 0, goal)
         if p is not None:
@@ -109,18 +108,13 @@ def main():
         else:
             print("Warning: infeasible optimization")
 
-        print("d", state_d)
-
         ts.append(t)
         states.append(robot.state)
         states_d.append(state_d)
         action = robot.controller(robot.state, state_d, v_d, omega_d, K_x=10, K_y=10, K_theta=30)
         action = np.clip(action, -10, 10)
-        # action = [50*np.cos(1.0*t), 50*np.sin(1.0*t)]
         actions_d.append(action)
         robot.apply_action(action)
-        # states[k+1] = r.state
-        # v.update_robots()
 
         vrobots[0].state = robot.state
         v.update_robots()

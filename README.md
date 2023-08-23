@@ -123,5 +123,16 @@ Find the TODO in `state_estimation.py`, then test your code with different robot
 
 ## 7. Robot Controller
 
-## 8. 
+The controller is operating with a receding planning horizon: At each timestep, a new trajectory is planned, and then the first action is executed using the control law.
 
+Execute
+
+```
+python3 controller_example.py
+```
+
+and try different goals and gains.
+
+## 8. Multi-Robot Collision Avoidance
+
+To execute everything together, take a look at `summerschool.py`. For testing, you may add additional "virtual" robots, or work together with other teams to try a true multi-robot collision avoidance.
