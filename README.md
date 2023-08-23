@@ -50,5 +50,21 @@ For training and evaluation we need to have pictures together with labels (robot
 We recorded robot poses using a MoCap system. Robot poses are saved in csv format.
 The required data can be downloaded [here](https://tubcloud.tu-berlin.de/s/Tk78deGXrgX497y).
 
+# Tutorial 3: Lego Mindstorm Robots
 
+## Connect
+
+Connect to the following Wifi Network: "TP-Link_3F22_ActivePercpt".
+
+Then use `ssh pi@<IP-ADDRESS>`, where you can find the IP address based on the list below.
+
+Alan, 192.168.100
+Ada, 192.168.0.101
+Albert, 192.168.0.102
+Joan, 192.168.0.103
+Konrad, 192.168.0.104
+Grace, 192.168.0.105
+Hermann, 192.168.0.106
+Kaethe, 192.168.0.107
+Margaret, 192.168.0.108
 

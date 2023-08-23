@@ -11,20 +11,20 @@ class LegoRobot():
         self.motor_right.stop()
 
     def forward(self):
-        self.motor_left.start(50)
-        self.motor_right.start(-50)
+        self.motor_left.start(-5)
+        self.motor_right.start(5)
 
     def back(self):
-        self.motor_left.start(-50)
-        self.motor_right.start(50)
+        self.motor_left.start(5)
+        self.motor_right.start(-5)
 
     def left(self):
-        self.motor_left.start(50)
-        self.motor_right.start(50)
+        self.motor_left.start(5)
+        self.motor_right.start(5)
 
     def right(self):
-        self.motor_left.start(-50)
-        self.motor_right.start(-50)
+        self.motor_left.start(-5)
+        self.motor_right.start(-5)
 
 def main():
 
@@ -32,12 +32,12 @@ def main():
 
     robot.forward()
     sleep(2)
-    robot.back()
-    sleep(2)
-    robot.right()
-    sleep(2)
-    robot.left()
-    sleep(2)
+    # robot.back()
+    # sleep(2)
+    # robot.right()
+    # sleep(2)
+    # robot.left()
+    # sleep(2)
     robot.stop()
 
 if __name__ == "__main__":

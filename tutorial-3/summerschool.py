@@ -56,11 +56,12 @@ class LegoRobot(Robot):
 
         move_left = self.pos_left - self.pos_left_last
         move_left = (move_left + 180) % 360 - 180 # in deg
+        # one motor is inverted -> correct it here
+        move_left = -move_left
 
         move_right = self.pos_right - self.pos_right_last
         move_right = (move_right + 180) % 360 - 180 # in deg
-        # one motor is inverted -> correct it here
-        move_right = -move_right
+
         # print(move_left, move_right)
 
         if self.state_estimate_time_last is not None:
@@ -103,8 +104,8 @@ class LegoRobot(Robot):
 
     def apply_action(self, action):
         print(action)
-        self.motor_left.start(action[0])
-        self.motor_right.start(-action[1])
+        self.motor_left.start(-action[0])
+        self.motor_right.start(action[1])
 
     def stop(self):
         self.motor_left.stop()
@@ -149,14 +150,18 @@ def perception_process(q):
 
 def main():
 
+    rel_pos_queue = Queue()
+    perception = Process(target=perception_process, args=(rel_pos_queue,))
+    perception.start()
+    # wait until camera is ready
+    rel_pos_queue.get()
+
     # m = RobotModel()
     # state_i, _, _ = reference_circle(m, 0, 0.2)
     state_i = [0,0,0]
     robot = LegoRobot(state_i)
 
-    rel_pos_queue = Queue()
-    perception = Process(target=perception_process, args=(rel_pos_queue,))
-    perception.start()
+
     # perception = PerceptionThread()
     # perception.start()
 
@@ -216,12 +221,13 @@ def main():
     rel_pos = []
     while True:
         t = time.time() - robot.starttime
-        if t > 30:
+        if t > 60:
             break
         print(t)
 
         try:
             rel_pos = rel_pos_queue.get_nowait()
+            v.add_image("camera", "perception.png")
         except queue.Empty:
             pass
 
@@ -270,7 +276,7 @@ def main():
         states.append(robot.state)
         states_d.append(state_d)
         action = robot.controller(robot.state, state_d, v_d, omega_d, K_x=10, K_y=10, K_theta=30)
-        action = np.clip(action, -50, 50)
+        action = np.clip(action, -5, 5)
         # action = [50*np.cos(1.0*t), 50*np.sin(1.0*t)]
         actions_d.append(action)
         robot.apply_action(action)

@@ -52,6 +52,8 @@ class Perception:
             
             # visualize result: plain image
             image_result = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
+
+            distance = []
             
         else:
 
@@ -64,8 +66,7 @@ class Perception:
         cv2.imwrite("perception.png", image_result)
         print("Wrote perception.png")
 
-        # TODO PIA: predict relative coordinates, not just distance!
-        return []
+        return distance
     
 
     def dist(self, bounding_boxes, focallength_px, robot_height_m):
@@ -81,14 +82,16 @@ class Perception:
             print(dist)
 
             # distance in camera coordinates
-            X = 0.5 * (b[0] * dist / F1 + b[2] * dist / F2)
-            Y = b[3] * dist / F1
+            X = 0.5 * (box[0] * dist / F1 + box[2] * dist / F2)
+            Y = box[3] * dist / F1
             Z = math.sqrt(dist**2 + X**2 + Y**2)
-            dist_cam = (X, Y, Z)
+
+            # reorder for robot coordinates, and ignore height since we are on a planar surface
+            dist_cam = (Z, -X, 0)
             
             distance.append(dist_cam)
                 
-        return distance_cam
+        return distance
 	
 	
     def visualize(self, im, bounding_boxes, distance):
@@ -99,7 +102,7 @@ class Perception:
 
             img_bb = cv2.rectangle(im, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])), (0, 255, 0), 2)
             image_bb_label = cv2.rectangle(img_bb, (int(box[0]), int(box[1])-20), (int(box[0]) + 70, int(box[1])), (255,255,255), -1)
-            image_bb_label_text = cv2.putText(image_bb_label, f"Dist: {(distance[i]):.3f}", (int(box[0]), int(box[1] - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0,0,0), 1, cv2.LINE_AA)
+            image_bb_label_text = cv2.putText(image_bb_label, f"Pos: {(distance[i][0]):.2f} {(distance[i][1]):.2f} {(distance[i][2]):.2f}", (int(box[0]), int(box[1] - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0,0,0), 1, cv2.LINE_AA)
             image_result = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
             i = i+1
         
