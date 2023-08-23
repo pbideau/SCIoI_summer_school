@@ -5,6 +5,7 @@ from threading import Timer, Thread
 import numpy as np
 from multiprocessing import Process, Queue
 import queue
+import psutil
 
 from vis import Visualizer
 
@@ -140,6 +141,12 @@ class LegoRobot(Robot):
 
 
 def perception_process(q):
+    # https://stackoverflow.com/questions/23060383/lowering-process-priority-of-multiprocessing-pool-on-windows
+    parent = psutil.Process()
+    parent.nice(20)
+    for child in parent.children():
+        child.nice(20)
+
     perception = Perception()
     while True:
         rel_pos = perception.sense_relative_positions()
@@ -219,6 +226,11 @@ def main():
     actions_d = []
     ts = []
     rel_pos = []
+
+    state_d = [0, 0, 0]
+    v_d = 0
+    omega_d = 0
+
     while True:
         t = time.time() - robot.starttime
         if t > 60:
@@ -276,7 +288,7 @@ def main():
         states.append(robot.state)
         states_d.append(state_d)
         action = robot.controller(robot.state, state_d, v_d, omega_d, K_x=10, K_y=10, K_theta=30)
-        action = np.clip(action, -5, 5)
+        action = np.clip(action, -10, 10)
         # action = [50*np.cos(1.0*t), 50*np.sin(1.0*t)]
         actions_d.append(action)
         robot.apply_action(action)

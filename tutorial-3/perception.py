@@ -3,20 +3,28 @@ import torch
 import cv2
 import time
 import math
+import numpy as np
 
 YOLO_MODEL = '../model/nano_model.pt'
 ROBOT_HEIGHT_M = 0.12
 FOCALLENGTH_PX = 627.590698 #470.325581 # picamera v3
 DEVICE = "cpu"
-CONFIDENCE = 0.5
+CONFIDENCE = 0.3
 
 class Perception:
     def __init__(self):
         # camera settings
         self.picam2 = Picamera2()
-        camera_config = self.picam2.configure(self.picam2.create_preview_configuration(main={"format": 'BGR888', "size": (1536, 864)}))
+        # camera_config = self.picam2.create_video_configuration(main={"format": 'BGR888', "size": (1536, 864)})
+        camera_config = self.picam2.create_preview_configuration(main={"format": 'BGR888', "size": (640, 360)})
         self.picam2.configure(camera_config)
         self.picam2.start()
+        # im = self.picam2.capture_array()
+        # print(im.shape)
+        # im = cv2.rotate(im, cv2.ROTATE_180)	
+        # im = cv2.resize(im, (640, 360), interpolation = cv2.INTER_AREA)
+        # print(im.shape)
+        # exit()
 
         # prediction settings
         self.model_YOLO = torch.hub.load('ultralytics/yolov5', 'custom', path=YOLO_MODEL, verbose=False)
@@ -36,11 +44,15 @@ class Perception:
         dx = int((width - 640)/2)
 
         im = self.picam2.capture_array()
+        print(im.shape)
         im = cv2.rotate(im, cv2.ROTATE_180)	
         
         # resize frame
-        im = cv2.resize(im, dim, interpolation = cv2.INTER_AREA)
-        im = im[:, dx:width-dx,:]
+        # im = cv2.resize(im, dim, interpolation = cv2.INTER_AREA)
+        im2 = np.zeros((480, 640, 3), dtype = np.uint8)
+        im2[60:420, :, :] = im
+        im = im2
+        # im = im[:, dx:width-dx,:]
         
         # run detection on image frame
         res = self.model_YOLO(im) 
@@ -77,12 +89,13 @@ class Perception:
             
             F1 = math.sqrt(FOCALLENGTH_PX**2 + (box[3]-240)**2 + (box[0]-320)**2) #upper point
             F2 = math.sqrt(FOCALLENGTH_PX**2 + (box[1]-240)**2 + (box[2]-320)**2) #lower point
-            b = (box[3]-320)/F1 - (box[1]-240)/F2
+            b = box[3]/F1 - box[1]/F2
             dist = ROBOT_HEIGHT_M / b
             print(dist)
 
-            box_center = (box[0] - box[2]) / 2
-            theta = (box_center - 320)/320 * math.radians(41) * 0.5
+            box_center = (box[2] - box[0]) / 2 + box[0]
+            print(box_center, list(box))
+            theta = (320 - box_center)/320 * math.radians(66) * 0.5
             X = dist * math.cos(theta)
             Y = dist * math.sin(theta)
             dist_cam = (X, Y, 0)
@@ -98,7 +111,7 @@ class Perception:
             distance.append(dist_cam)
                 
         return distance
-	
+
 	
     def visualize(self, im, bounding_boxes, distance):
         
@@ -107,7 +120,7 @@ class Perception:
         for box in bounding_boxes:
 
             img_bb = cv2.rectangle(im, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])), (0, 255, 0), 2)
-            image_bb_label = cv2.rectangle(img_bb, (int(box[0]), int(box[1])-20), (int(box[0]) + 70, int(box[1])), (255,255,255), -1)
+            image_bb_label = cv2.rectangle(img_bb, (int(box[0]), int(box[1])-20), (int(box[0]) + 150, int(box[1])), (255,255,255), -1)
             image_bb_label_text = cv2.putText(image_bb_label, f"Pos: {(distance[i][0]):.2f} {(distance[i][1]):.2f} {(distance[i][2]):.2f}", (int(box[0]), int(box[1] - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0,0,0), 1, cv2.LINE_AA)
             image_result = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
             i = i+1
