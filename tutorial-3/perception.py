@@ -81,13 +81,19 @@ class Perception:
             dist = ROBOT_HEIGHT_M / b
             print(dist)
 
+            box_center = (box[0] - box[2]) / 2
+            theta = (box_center - 320)/320 * math.radians(41) * 0.5
+            X = dist * math.cos(theta)
+            Y = dist * math.sin(theta)
+            dist_cam = (X, Y, 0)
+
             # distance in camera coordinates
-            X = 0.5 * ((box[0]-320) * dist / F1 + (box[2]-320) * dist / F2)
-            Y = (box[3]-320) * dist / F1
-            Z = math.sqrt(dist**2 + X**2 + Y**2)
+            #X = 0.5 * ((box[0]-320) * dist / F1 + (box[2]-320) * dist / F2)
+            #Y = (box[3]-320) * dist / F1
+            #Z = math.sqrt(dist**2 + X**2 + Y**2)
 
             # reorder for robot coordinates, and ignore height since we are on a planar surface
-            dist_cam = (Z, -X, 0)
+            #dist_cam = (Z, -X, 0)
             
             distance.append(dist_cam)
                 
