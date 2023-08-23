@@ -54,22 +54,24 @@ The required data can be downloaded [here](https://tubcloud.tu-berlin.de/s/Tk78d
 
 ## 1. Connect
 
-Connect to the following Wifi Network: "TP-Link_3F22_ActivePercpt".
+Connect to the following Wifi Network: "TP-Link_3F22_ActivePercpt". Note that this network does not provide Internet access for security reasons.
 
 We recommend using VS Code with the "Remote - SSH" extension. To connect:
 
 1. Ctrl+Shift+P: "Remote-SSH: Add New SSH Host"
-2. Type `ssh pi@<IP-ADDRESS>`, where you can find the IP address based on the list below.
+2. Type `ssh pi@<IP-ADDRESS>`, where you can find the IP address based on the table below.
 
-Alan, 192.168.100
-Ada, 192.168.0.101
-Albert, 192.168.0.102
-Joan, 192.168.0.103
-Konrad, 192.168.0.104
-Grace, 192.168.0.105
-Hermann, 192.168.0.106
-Kaethe, 192.168.0.107
-Margaret, 192.168.0.108
+    | Robot    | IP            |
+    | -------- | ------------- |
+    | Alan     | 192.168.0.100 |
+    | Ada      | 192.168.0.101 |
+    | Albert   | 192.168.0.102 |
+    | Joan     | 192.168.0.103 |
+    | Konrad   | 192.168.0.104 |
+    | Grace    | 192.168.0.105 |
+    | Hermann  | 192.168.0.106 |
+    | Kaethe   | 192.168.0.107 |
+    | Margaret | 192.168.0.108 |
 
 3. Ctrl+Shift+P: "Remote-SSH: Connect to Host", select the host you added, and use `pi` as password.
 
