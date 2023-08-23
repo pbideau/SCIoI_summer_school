@@ -77,13 +77,13 @@ class Perception:
             
             F1 = math.sqrt(FOCALLENGTH_PX**2 + (box[3]-240)**2 + (box[0]-320)**2) #upper point
             F2 = math.sqrt(FOCALLENGTH_PX**2 + (box[1]-240)**2 + (box[2]-320)**2) #lower point
-            b = box[3]/F1 - box[1]/F2
+            b = (box[3]-320)/F1 - (box[1]-240)/F2
             dist = ROBOT_HEIGHT_M / b
             print(dist)
 
             # distance in camera coordinates
-            X = 0.5 * (box[0] * dist / F1 + box[2] * dist / F2)
-            Y = box[3] * dist / F1
+            X = 0.5 * ((box[0]-320) * dist / F1 + (box[2]-320) * dist / F2)
+            Y = (box[3]-320) * dist / F1
             Z = math.sqrt(dist**2 + X**2 + Y**2)
 
             # reorder for robot coordinates, and ignore height since we are on a planar surface
