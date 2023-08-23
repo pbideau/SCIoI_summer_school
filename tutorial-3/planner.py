@@ -1,3 +1,5 @@
+# This file contains functions unchanged from tutorial-1
+
 import numpy as np
 import cvxpy as cp
 
@@ -20,6 +22,23 @@ def reference_circle(robot, t, r=5.0):
     y_dot = r*np.cos(t)
     y_ddot = -r*np.sin(t)
     return robot.diff_flatness(x, y, x_dot, y_dot, x_ddot, y_ddot)
+
+
+def plan_bezier(q_start, q_goal, v=1):
+    # Define and solve an optimization problem
+    p = cp.Variable((4,2))
+
+    cost = cp.norm2(3*(p[0]-p[1]-p[2]+p[3]))
+    prob = cp.Problem(
+        cp.Minimize(cost),
+        [
+            bezier(p, 0) == q_start[0:2],
+            bezier_d(p, 0) == [v*np.cos(q_start[2]), v*np.sin(q_start[2])],
+            bezier(p, 1) == q_goal[0:2]
+        ]
+    )
+    prob.solve()
+    return p.value
 
 
 def plan(states, i, goal):

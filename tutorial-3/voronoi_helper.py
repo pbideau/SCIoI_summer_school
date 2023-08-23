@@ -1,3 +1,5 @@
+# This file contains functions unchanged from tutorial-1
+
 import numpy as np
 
 # Logic from https://github.com/scipy/scipy/blob/a4ed9450b6d5c1f36495b29a0471f03b471ca8ae/scipy/spatial/_plotutils.py#L235-L254

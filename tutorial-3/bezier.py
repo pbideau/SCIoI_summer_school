@@ -1,3 +1,5 @@
+# This file contains functions unchanged from tutorial-1
+
 
 # Define Bezier curve functions
 def bezier(p, t):

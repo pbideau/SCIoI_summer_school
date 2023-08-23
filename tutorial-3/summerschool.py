@@ -1,7 +1,6 @@
 from buildhat import Motor
 import time
 from time import sleep
-from threading import Timer, Thread
 import numpy as np
 from multiprocessing import Process, Queue
 import queue
@@ -16,128 +15,8 @@ import matplotlib.pyplot as plt
 from planner import *
 from bezier import *
 from robot import Robot
+from state_estimation import LegoRobot
 from perception import Perception
-
-class RepeatTimer(Timer):
-    def run(self):
-        while not self.finished.wait(self.interval):
-            self.function(*self.args, **self.kwargs)
-
-
-class LegoRobot(Robot):
-    def __init__(self, state=[0,0,0]):
-        super().__init__(state=state, r=5.5/2/100, L=11/100)
-
-        self.motor_left = Motor('C')
-        # self.motor_left.set_speed_unit_rpm(True)
-        self.pos_left = self.motor_left.get_aposition()
-        self.pos_left_last = self.pos_left
-        self.motor_left.when_rotated = self.handle_motor_left
-        self.motor_right = Motor('D')
-        # self.motor_left.set_speed_unit_rpm(True)
-        self.motor_left.interval = 10 # ms
-        self.pos_right = self.motor_right.get_aposition()
-        self.pos_right_last = self.pos_right
-        self.motor_right.when_rotated = self.handle_motor_right
-        self.motor_right.interval = 10 # ms
-
-        print(self.motor_left.description)
-        print(self.motor_right.description)
-
-        self.timer = RepeatTimer(0.05, self.state_estimate)
-        self.timer.start()
-        self.starttime = time.time()
-        self.motor_left_data = []
-        self.motor_right_data = []
-        self.state_estimate_data = []
-        self.state_estimate_time_last = None
-
-    def state_estimate(self):
-        t = time.time()
-
-        move_left = self.pos_left - self.pos_left_last
-        move_left = (move_left + 180) % 360 - 180 # in deg
-        # one motor is inverted -> correct it here
-        move_left = -move_left
-
-        move_right = self.pos_right - self.pos_right_last
-        move_right = (move_right + 180) % 360 - 180 # in deg
-
-        # print(move_left, move_right)
-
-        if self.state_estimate_time_last is not None:
-            dt = t - self.state_estimate_time_last
-            # convert to rad/s
-            ul = np.radians(move_left) / dt
-            ur = np.radians(move_right) / dt
-            self.propagate([ul, ur], dt)
-            self.state_estimate_data.append([time.time() - self.starttime, ul, ur])
-
-            print(self.state)
-
-        self.pos_left_last = self.pos_left
-        self.pos_right_last = self.pos_right
-        self.state_estimate_time_last = t
-
-
-
-    def handle_motor_left(self, speed, pos, apos):
-        """Motor data
-
-        :param speed: Speed of motor
-        :param pos: Position of motor
-        :param apos: Absolute position of motor
-        """
-        self.pos_left = apos
-        self.motor_left_data.append([time.time() - self.starttime, speed, pos, apos])
-        # print("Motor left", speed, pos, apos)
-
-    def handle_motor_right(self, speed, pos, apos):
-        """Motor data
-
-        :param speed: Speed of motor
-        :param pos: Position of motor
-        :param apos: Absolute position of motor
-        """
-        self.pos_right = apos
-        self.motor_right_data.append([time.time() - self.starttime, speed, pos, apos])
-        # print("Motor right", speed, pos, apos)
-
-    def apply_action(self, action):
-        print(action)
-        self.motor_left.start(-action[0])
-        self.motor_right.start(action[1])
-
-    def stop(self):
-        self.motor_left.stop()
-        self.motor_right.stop()
-
-    # def forward(self):
-    #     self.motor_left.start(50)
-    #     self.motor_right.start(-50)
-
-    # def back(self):
-    #     self.motor_left.start(-50)
-    #     self.motor_right.start(50)
-
-    # def left(self):
-    #     self.motor_left.start(50)
-    #     self.motor_right.start(50)
-
-    # def right(self):
-    #     self.motor_left.start(-50)
-    #     self.motor_right.start(-50)
-
-# class PerceptionThread(Thread):
-#     def __init__(self):
-#         super().__init__()
-#         self.rel_pos = []
-#         self.perception = Perception()
-
-#     def run(self):
-#         while True:
-#             self.rel_pos = Process(target=self.perception.sense_relative_positions)
-#             print("NEW REL POS")
 
 
 def perception_process(q):
@@ -151,9 +30,6 @@ def perception_process(q):
     while True:
         rel_pos = perception.sense_relative_positions()
         q.put(rel_pos)
-        print("NEW REL POS")
-
-
 
 def main():
 
@@ -167,55 +43,6 @@ def main():
     # state_i, _, _ = reference_circle(m, 0, 0.2)
     state_i = [0,0,0]
     robot = LegoRobot(state_i)
-
-
-    # perception = PerceptionThread()
-    # perception.start()
-
-    # ts = np.arange(0,10,0.1)
-    # states = np.empty((len(ts)+1, 3))
-    # states_d = np.empty((len(ts)+1, 3))
-    # r = Robot([0,0,0])
-    # v.add_robot("r", r)
-    # states[0] = r.state
-    # for k, t in enumerate(ts):
-
-    # motion planning
-
-# # Define and solve an optimization problem
-
-#     q_start = [0,0,0]
-#     q_goal = [0.2,0.2,0]
-#     v = 1
-
-#     p = cp.Variable((4,2))
-
-#     cost = cp.norm2(3*(p[0]-p[1]-p[2]+p[3]))
-#     prob = cp.Problem(
-#         cp.Minimize(cost),
-#         [
-#             bezier(p, 0) == q_start[0:2],
-#             bezier_d(p, 0) == [v*np.cos(q_start[2]), v*np.sin(q_start[2])],
-#             bezier(p, 1) == q_goal[0:2]
-#         ]
-#     )
-#     prob.solve()
-#     print(p.value)
-
-#     # Plot the result
-#     fig, ax = plt.subplots()
-#     ax.set_aspect(1)
-#     ax.scatter(p.value[:,0], p.value[:,1])
-#     ts = np.linspace(0, 1, 100)
-#     ps = np.empty((len(ts), 2))
-#     for k, t in enumerate(ts):
-#         ps[k] = bezier(p.value, t)
-#     ax.plot(ps[:,0], ps[:,1])
-
-#     plt.savefig("opt.pdf")
-
-
-    ##
 
     goal = np.array([1.0,0,0])
 
@@ -333,15 +160,6 @@ def main():
 
     plt.savefig("actions.pdf")
 
-
-    # robot.forward()
-    # sleep(5)
-    # robot.back()
-    # sleep(1)
-    # robot.right()
-    # sleep(1)
-    # robot.left()
-    # sleep(1)
     robot.stop()
 
 if __name__ == "__main__":

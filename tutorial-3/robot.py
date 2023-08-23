@@ -1,3 +1,5 @@
+# This file contains functions unchanged from tutorial-1
+
 import numpy as np
 
 class Robot:
