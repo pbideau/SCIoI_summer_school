@@ -75,7 +75,11 @@ We recommend using VS Code with the "Remote - SSH" extension. To connect:
 
 3. Ctrl+Shift+P: "Remote-SSH: Connect to Host", select the host you added, and use `pi` as password.
 
+4. Open the folder `/home/pi/Desktop/SCIoI_summer_school/`
+
 You can now edit files like on your local machine. The integrated VS Code terminal is executing on the robot.
+
+Open a terminal using the menu `View/Terminal`, so that you can execute scripts in the next tasks.
 
 ## 2. Camera Test
 
@@ -106,6 +110,8 @@ python3 perception.py
 ```
 
 Follow the Visual Studio link to open meshcat in your browser and append `/static/` (including the trailing slash) to the URL.
+
+Alternatively, open the following URL in your browser: `http://<IP-of-your-robot>:7000/static/` (including the trailing slash).
 
 ## 5. Keyboard Control
 
