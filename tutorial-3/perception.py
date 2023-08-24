@@ -5,7 +5,7 @@ import time
 import math
 import numpy as np
 
-YOLO_MODEL = '../model/nano_model.pt'
+YOLO_MODEL = 'model/nano_model.pt'
 ROBOT_HEIGHT_M = 0.12
 FOCALLENGTH_PX = 627.590698 #470.325581 # picamera v3
 DEVICE = "cpu"
