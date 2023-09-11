@@ -33,21 +33,13 @@ class BBDataset(Dataset):
         Returns:
             tuple: A tuple containing the input and distance.
         """
-        output_units = 1
+        
         BBH = (self.data[idx][3] - self.data[idx][1]) / MAX_HEIGHT
 
-        BBW = (self.data[idx][2] - self.data[idx][0]) / MAX_WIDTH
+        input = torch.stack((self.im_height, BBH))
 
-        BBCenter = torch.tensor([(self.data[idx][2] + self.data[idx][0]) / 2 ,
-                                 (self.data[idx][3] + self.data[idx][1]) / 2 ], dtype = torch.float32) / MAX_HEIGHT
-        BBAspectRatio = BBW / BBH / 6
-        BBClass = self.data[idx][5]
-        BBConf = self.data[idx][4]
-        BBArea = BBH * BBW
-        BBAreaCover = (BBArea)
-        params = torch.stack((self.im_height,self.im_width, BBH, BBW, BBAspectRatio, BBClass, BBConf, BBArea, BBAreaCover))
-        input = torch.cat((params, BBCenter), 0)
         distance = torch.tensor([self.data[idx][6] / MAX_DIST], dtype = torch.float32)
+
         return input, distance
 
 
